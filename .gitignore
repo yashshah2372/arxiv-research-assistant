@@ -1,0 +1,14 @@
+# Secrets — NEVER commit
+.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Vector DB (regenerate with ingest.py)
+chroma_db/
+
+# OS
+.DS_Store
+Thumbs.db
