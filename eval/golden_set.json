@@ -1,0 +1,82 @@
+[
+  {
+    "id": "q1",
+    "question": "What four fundamental abilities does the RGB benchmark use to evaluate RAG systems?",
+    "relevant_doc_ids": ["2309.01431v2"],
+    "expected_behavior": "answer",
+    "expected_answer": "Noise robustness, negative rejection, information integration, and counterfactual robustness.",
+    "notes": "Easy single-source positive. Baseline sanity check: if recall@k misses this, retrieval is broken."
+  },
+  {
+    "id": "q2",
+    "question": "Which approaches improve RAG by fine-tuning the model rather than by changing retrieval?",
+    "relevant_doc_ids": ["2501.11929v1", "2405.13002v1", "2601.07054v1", "2512.17194v1"],
+    "expected_behavior": "answer",
+    "expected_answer": "ALoFTRAG (synthetic training data + LoRA), DuetRAG (domain fine-tuning combined with RAG), the Fine-Tuning vs RAG multi-hop comparison, and MMRAG-RFT (two-stage reinforcement fine-tuning).",
+    "notes": "Multi-source positive. 4 relevant docs, so recall@4 demands a perfect top-4. Report the recall curve, not one k."
+  },
+  {
+    "id": "q3",
+    "question": "What do these papers say about reranking?",
+    "relevant_doc_ids": ["2406.13692v2"],
+    "expected_behavior": "partial",
+    "expected_answer": "The corpus does not substantively cover reranking. Only Synchronous Faithfulness Monitoring mentions it, in passing, as one of the baselines (alongside abstention and contrastive decoding) that its FOD method outperforms.",
+    "notes": "THE regression test. On 2026-07-25 agent.py answered this by presenting DuetRAG and CommunityKG-RAG as though they addressed reranking - a faithfulness failure."
+  },
+  {
+    "id": "q4",
+    "question": "How is a cross-encoder reranker trained, and what does it cost at query time?",
+    "relevant_doc_ids": [],
+    "expected_behavior": "abstain",
+    "expected_answer": "I don't have enough information - no paper in this corpus discusses cross-encoder rerankers.",
+    "notes": "True negative, verified: zero corpus matches for 'cross-encoder'. Sounds adjacent to the corpus topic, which is what makes it a good trap."
+  },
+  {
+    "id": "q5",
+    "question": "Is there any work surveying multimodal retrieval-augmented generation?",
+    "relevant_doc_ids": ["2504.08748v1"],
+    "expected_behavior": "answer",
+    "expected_answer": "Yes - 'A Survey of Multimodal Retrieval-Augmented Generation'.",
+    "notes": "Single-source positive. Distinct vocabulary from the rest of the corpus, so it should be an easy retrieval win."
+  },
+  {
+    "id": "q6",
+    "question": "For multi-hop question answering over novel knowledge, is fine-tuning or RAG more effective?",
+    "relevant_doc_ids": ["2601.07054v1"],
+    "expected_behavior": "answer",
+    "expected_answer": "Addressed directly by 'Fine-Tuning vs. RAG for Multi-Hop Question Answering with Novel Knowledge'.",
+    "notes": "Single-source positive, but several other papers mention multi-hop in passing - tests precision, not just recall."
+  },
+  {
+    "id": "q7",
+    "question": "Which papers use knowledge graphs or graph structure to improve retrieval?",
+    "relevant_doc_ids": ["2502.01113v3", "2408.08535v1", "2509.21336v1", "2509.10467v1"],
+    "expected_behavior": "answer",
+    "expected_answer": "GFM-RAG (graph foundation model), CommunityKG-RAG (community structures in KGs), HetaRAG (hybrid retrieval across heterogeneous stores), and DSRAG (document-derived multimodal knowledge).",
+    "notes": "Multi-source positive. Verify each of these by reading the abstract - do not trust the keyword match alone."
+  },
+  {
+    "id": "q8",
+    "question": "Is there a shared evaluation track or community benchmark for RAG in this corpus?",
+    "relevant_doc_ids": ["2603.09891v1"],
+    "expected_behavior": "answer",
+    "expected_answer": "Yes - 'Overview of the TREC 2025 Retrieval Augmented Generation (RAG) Track'.",
+    "notes": "Single-source positive. Pairs with q1 for the evaluation theme."
+  },
+  {
+    "id": "q9",
+    "question": "What chunk size and overlap do these papers recommend for indexing documents?",
+    "relevant_doc_ids": ["2412.15404v1"],
+    "expected_behavior": "partial",
+    "expected_answer": "No paper recommends specific chunk sizes or overlap. The academic literature navigation framework mentions using 'semantic chunking' as a technique, but gives no parameters.",
+    "notes": "Partial. A very natural question for a RAG corpus, and the corpus genuinely cannot answer it. Tempting for the model to invent numbers - watch for hallucinated '512 tokens with 10% overlap'."
+  },
+  {
+    "id": "q10",
+    "question": "What p95 latency do these RAG systems achieve when served in production?",
+    "relevant_doc_ids": [],
+    "expected_behavior": "abstain",
+    "expected_answer": "I don't have enough information - no paper in this corpus reports production serving latency.",
+    "notes": "True negative, verified: zero corpus matches for 'latency'. Research corpora rarely report serving metrics, so this is a realistic gap."
+  }
+]
