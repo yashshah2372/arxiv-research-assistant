@@ -24,6 +24,7 @@ Evaluation:  golden set → recall@k (retrieval) + LLM-as-judge faithfulness (ge
 | `eval/run_eval.py` | **Retrieval recall@k** for k = 1, 3, 5, 10 over the 8 questions that have relevant papers. Abstention questions are reported separately so they can't inflate the mean. |
 | `eval/run_faithfulness.py` | **Faithfulness of the single-shot pipeline**: a judge LLM checks whether every claim in the answer is supported by the retrieved context. It never sees the expected answer, so it measures grounding, not correctness. A correct abstention counts as faithful. |
 | `eval/run_faithfulness_agent.py` | The same faithfulness check on the **agent path**, including tool-call failures. |
+| `eval/run_negative_control.py` | **Checks the judge itself.** Feeds it answers with known faithfulness (faithful, fabricated, correct refusal) built from real retrieved context, and fails if it can't tell them apart. A judge that rates everything as faithful would make the scores above meaningless. |
 
 ### Results (last run)
 | Metric | Result |
@@ -35,11 +36,26 @@ Evaluation:  golden set → recall@k (retrieval) + LLM-as-judge faithfulness (ge
 
 The takeaway: on a small, focused corpus the simpler pipeline was more faithful than the agent. The agent's extra reasoning steps gave it more room to drift from the retrieved context, and its tool calls sometimes failed. More autonomy is not automatically better; measure it.
 
+## API
+
+A FastAPI service wraps the single-shot pipeline:
+
+```bash
+docker build -t arxiv-rag .          # also builds the vector DB at build time
+docker run -p 8000:8000 -e GROQ_API_KEY=your_key arxiv-rag
+
+curl -X POST localhost:8000/ask -H 'content-type: application/json' \
+  -d '{"question": "How do papers evaluate RAG systems?", "k": 3}'
+```
+
+Returns `{"answer": "... [1]", "sources": [{"number": 1, "title": "...", "url": "..."}]}`. `GET /health` is used for container checks. Offline tests (`pytest -q`) cover the API with a stubbed pipeline, and CI builds the image and checks that the container starts.
+
 ## Stack
 - Python
 - **Chroma** (local vector DB, MiniLM embeddings)
 - **Groq** (Llama 3.3 70B through an OpenAI-compatible API); provider-agnostic, swap `base_url` for OpenAI or Claude
 - **LangGraph** (ReAct agent orchestration)
+- **FastAPI** + **Docker** (API, with the vector DB built at image build time)
 
 ## Setup
 ```bash
@@ -57,6 +73,7 @@ python agent.py                 # agentic version
 python eval/run_eval.py                    # retrieval recall@k
 python eval/run_faithfulness.py            # faithfulness, single-shot
 python eval/run_faithfulness_agent.py      # faithfulness, agent
+python eval/run_negative_control.py        # does the judge catch fabricated answers?
 ```
 
 ## Status
@@ -64,4 +81,4 @@ python eval/run_faithfulness_agent.py      # faithfulness, agent
 - [x] End-to-end RAG with citations
 - [x] Agentic layer (LangGraph ReAct agent with a search tool)
 - [x] Evaluation harness (recall@k, LLM-as-judge faithfulness)
-- [ ] Serve as an API (FastAPI) and package with Docker
+- [x] Serve as an API (FastAPI) and package with Docker
