@@ -28,7 +28,10 @@ class AskResponse(BaseModel):
 
 def get_answerer():
     # Imported lazily so the app (and its tests) start without a vector DB or API key.
-    from rag import answer
+    try:
+        from rag import answer
+    except KeyError as exc:  # rag.py reads GROQ_API_KEY at import time
+        raise HTTPException(status_code=503, detail=f"service not configured: missing {exc.args[0]}")
     return answer
 
 

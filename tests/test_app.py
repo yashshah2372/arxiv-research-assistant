@@ -54,3 +54,11 @@ def test_negative_control_scoring_rules():
     assert not passed("fabricated", None)
     s = summarize([{"kind": "fabricated", "score": 0.1}, {"kind": "fabricated", "score": 0.9}])
     assert s == {"fabricated": {"passed": 1, "total": 2}}
+
+
+def test_missing_api_key_returns_503(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    sys.modules.pop("rag", None)
+    app.dependency_overrides.clear()
+    r = TestClient(app).post("/ask", json={"question": "anything here"})
+    assert r.status_code == 503 and "GROQ_API_KEY" in r.json()["detail"]
